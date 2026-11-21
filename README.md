@@ -1,7 +1,6 @@
 # HackMaya — Yáanal Ka’an (PWA Offline-First y Pasaporte de Talento)
 
-> **Nombre sugerido del repositorio:** `HackMaya-Yaanal-Kaan`  
-> Proyecto desarrollado para **Hack Maya (DevFest Cancún 2026)** bajo la línea temática **06. Educación y talento** (aprendizaje, empleabilidad y brecha digital).
+Proyecto desarrollado para **Hack Maya (DevFest Cancún 2026)** bajo la línea temática **06. Educación y talento** (aprendizaje, empleabilidad y brecha digital).
 
 ## Arquitectura y Stack
 
@@ -49,5 +48,5 @@ npm run build
 npm run preview
 ```
 
-## Documentación de Entrega
-- [Propuesta Técnica](docs/PROPUESTA_TECNICA.md)
+## Documentación Técnica
+- [Propuesta Técnica y Arquitectura](docs/PROPUESTA_TECNICA.md)

@@ -21,7 +21,7 @@ No agregues funcionalidades fuera de estas 4 vistas hasta que el flujo completo 
 - `backend/app/seed_data.py`: Datos iniciales (cursos en Español/Maya y candidatos/vacantes semilla).
 - `frontend/src/db/indexedDb.ts`: Esquema Dexie.js (`courses`, `progress`, `sync_queue`, `student_profile`).
 - `frontend/src/hooks/useOfflineSync.ts`: Detector de conectividad y vaciado automático de `sync_queue`.
-- `docs/`: `PROPUESTA_TECNICA.md` y `PITCH_5_MINUTOS.md`.
+- `docs/`: `PROPUESTA_TECNICA.md` (documentación técnica y arquitectura).
 
 # PROTOCOLO DE TRABAJO Y RESPUESTA
 - **Código Producción-Ready:** Entrega siempre archivos completos, tipados y listos para ejecutar, evitando fragmentos incompletos (`// TODO: implementar aquí`).
