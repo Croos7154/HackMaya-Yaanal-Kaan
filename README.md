@@ -23,25 +23,29 @@ flowchart LR
 
 ## Las 4 Vistas Core
 
-1. **1. Rutas (`CourseCatalog.tsx`):** Descarga de paquetes ligeros (*Inglés Básico para Turismo* y *Finanzas para Artesanos*), barra de almacenamiento local, indicador de versión (`Delta Sync`) y liberación de espacio tras aprobar.
-2. **2. Aula Offline (`OfflineClassroom.tsx`):** Lección bilingüe, audio nativo en español y pronunciación en inglés por frase, cronómetro de permanencia e intentos, evaluación de 3 preguntas con retroalimentación y guardado en `sync_queue`.
+1. **1. Rutas (`CourseCatalog.tsx`):** Descarga de paquetes ligeros (*Inglés Básico para Turismo* y *Finanzas para Artesanos*), barra comparativa de ahorro de datos (`-100% MB` vs video), almacenamiento local, `Delta Sync` y liberación de espacio tras aprobar.
+2. **2. Aula Offline (`OfflineClassroom.tsx`):** Selector **Español / Maayat'aan**, HUD con vidas y racha, 5 dinámicas interactivas (*Vocab con reproductor offline*, *Ordenar*, *Pares*, *Audio normal/lento* y *Examen*), cronómetro de permanencia y guardado en `sync_queue` con firma SHA-256.
 3. **3. Pasaporte (`TalentPassport.tsx`):** Perfil editable, racha de estudio, barra de avance curricular, código QR con enlace verificable (`?verify=YK-...`), exportación imprimible a PDF (`Imprimir / PDF`) y validación contra `GET /api/v1/verify/{validation_hash}`.
-4. **4. Portal B2B (`RecruiterPortal.tsx`):** Directorio de talento certificado filtrable por habilidad y comunidad, métricas de tracción (`/api/v1/analytics`) e invitación a entrevista.
+4. **4. Portal B2B (`RecruiterPortal.tsx`):** Directorio de talento certificado filtrable por habilidad y comunidad, métricas de tracción (`/api/v1/analytics`), verificador QR (`Verificar Pasaporte QR`) e invitación a entrevista.
+
+Además incluye **Modo Ahorro 2G/3G**, botón **Modo Avión** y un **Inspector Técnico (`IndexedDB · sync_queue`)** para auditar la cola offline en vivo.
 
 ## Capturas de la Aplicación
 
-### 1. Catálogo y Almacenamiento Offline (`1. Rutas`)
-![Catálogo y descarga offline](docs/screenshots/01-rutas-offline.jpg)
+### 1. Catálogo de Rutas y Ahorro de Datos (`1. Catálogo de Rutas`)
+![Catálogo de micro-rutas y descarga offline](docs/screenshots/01-rutas-offline.jpg)
 
-### 2. Aula Offline con Lectura Dual ES/EN y Evaluación SHA-256
-![Aula interactiva con audio ES/EN](docs/screenshots/02-aula-leccion.png)
-![Evaluación aprobada y guardada en sync_queue](docs/screenshots/03-aula-evaluacion.png)
+### 2. Aula Offline Bilingüe en 5 Pasos (`2. Aula Offline`)
+![Paso 1: Vocabulario con reproductor de audio offline](docs/screenshots/02-aula-vocab.jpg)
+![Paso 2: Ordenar la oración](docs/screenshots/03-aula-ordenar.png)
+![Paso 3: Conectar pares Español / Maya / Inglés](docs/screenshots/04-aula-pares.png)
+![Paso 5: Examen completado con hash SHA-256](docs/screenshots/05-aula-examen.png)
 
-### 3. Pasaporte de Talento Verificable por QR
-![Pasaporte de Talento con QR y sincronización PostgreSQL](docs/screenshots/04-pasaporte-qr.jpg)
+### 3. Pasaporte de Talento Verificable por QR (`3. Pasaporte QR`)
+![Pasaporte de Talento con QR y sincronización PostgreSQL](docs/screenshots/06-pasaporte-qr.jpg)
 
-### 4. Portal B2B para Reclutadores
-![Portal B2B con métricas y candidatos certificados](docs/screenshots/05-portal-b2b.png)
+### 4. Portal B2B para Reclutadores (`4. Portal B2B`)
+![Portal B2B con métricas, verificador QR y candidatos certificados](docs/screenshots/07-portal-b2b.jpg)
 
 ## Endpoints de la API (`FastAPI`)
 
