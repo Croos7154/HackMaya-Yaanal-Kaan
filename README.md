@@ -1,6 +1,14 @@
 # HackMaya — Yáanal Ka’an (PWA Offline-First y Pasaporte de Talento)
 
-Proyecto desarrollado para **Hack Maya (DevFest Cancún 2026)** bajo la línea temática **06. Educación y talento** (aprendizaje, empleabilidad y brecha digital).
+> *"Conectando el talento local con oportunidades globales, incluso sin internet."*
+
+**Yáanal Ka’an** (*"Bajo el mismo cielo"*) es una plataforma educativa y de vinculación laboral diseñada bajo una arquitectura **Offline-First** para el **Hack Maya (DevFest Cancún 2026)**, dentro de la línea temática **06. Educación y talento** *(con impacto transversal en 04. Comunidades y 07. Economía regional)*.
+
+### ¿Qué problema resuelve?
+En comunidades rurales y semiurbanas de la región Maya, la intermitencia de conectividad, el consumo excesivo de datos de las plataformas tradicionales, la falta de certificaciones prácticas y la barrera lingüística limitan el acceso a capacitación y empleo formal.
+
+### Solución
+Yáanal Ka’an permite descargar paquetes ligeros de micro-aprendizaje en puntos con Wi-Fi público para estudiar **100% sin conexión** en **Español y Maayat'aan (Maya)**, validar competencias mediante un **Pasaporte de Talento con QR verificable** (sincronizado automáticamente al recuperar señal) y conectar directamente a egresados con empresas, hoteles y cooperativas locales en el **Portal B2B** — manteniendo acceso **100% gratuito para estudiantes** y sostenibilidad vía suscripciones **B2B** y licenciamiento **B2G / ONGs**.
 
 ## Arquitectura Offline-First
 
