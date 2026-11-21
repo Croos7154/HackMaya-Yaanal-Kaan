@@ -28,6 +28,21 @@ flowchart LR
 3. **3. Pasaporte (`TalentPassport.tsx`):** Perfil editable, racha de estudio, barra de avance curricular, código QR con enlace verificable (`?verify=YK-...`), exportación imprimible a PDF (`Imprimir / PDF`) y validación contra `GET /api/v1/verify/{validation_hash}`.
 4. **4. Portal B2B (`RecruiterPortal.tsx`):** Directorio de talento certificado filtrable por habilidad y comunidad, métricas de tracción (`/api/v1/analytics`) e invitación a entrevista.
 
+## Capturas de la Aplicación
+
+### 1. Catálogo y Almacenamiento Offline (`1. Rutas`)
+![Catálogo y descarga offline](docs/screenshots/01-rutas-offline.jpg)
+
+### 2. Aula Offline con Lectura Dual ES/EN y Evaluación SHA-256
+![Aula interactiva con audio ES/EN](docs/screenshots/02-aula-leccion.png)
+![Evaluación aprobada y guardada en sync_queue](docs/screenshots/03-aula-evaluacion.png)
+
+### 3. Pasaporte de Talento Verificable por QR
+![Pasaporte de Talento con QR y sincronización PostgreSQL](docs/screenshots/04-pasaporte-qr.jpg)
+
+### 4. Portal B2B para Reclutadores
+![Portal B2B con métricas y candidatos certificados](docs/screenshots/05-portal-b2b.png)
+
 ## Endpoints de la API (`FastAPI`)
 
 | Método | Ruta | Descripción |
