@@ -8,6 +8,11 @@ import { useOfflineSync } from './hooks/useOfflineSync';
 
 type ActiveTab = 'catalog' | 'classroom' | 'passport' | 'recruiter';
 
+interface BeforeInstallPromptEvent extends Event {
+  prompt: () => Promise<void>;
+  userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
+}
+
 const TABS: Array<{ id: ActiveTab; label: string }> = [
   { id: 'catalog', label: '1. Rutas' },
   { id: 'classroom', label: '2. Aula Offline' },
@@ -16,8 +21,15 @@ const TABS: Array<{ id: ActiveTab; label: string }> = [
 ];
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<ActiveTab>('catalog');
+  const [initialVerifyHash] = useState<string | null>(() => {
+    if (typeof window === 'undefined') return null;
+    return new URLSearchParams(window.location.search).get('verify');
+  });
+  const [activeTab, setActiveTab] = useState<ActiveTab>(() =>
+    initialVerifyHash ? 'passport' : 'catalog'
+  );
   const [selectedCourseId, setSelectedCourseId] = useState<string | null>(null);
+  const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const {
     isOnline,
     simulatedOffline,
@@ -32,10 +44,26 @@ export default function App() {
     void ensureDefaultStudentProfile();
   }, []);
 
+  useEffect(() => {
+    const onBeforeInstall = (event: Event) => {
+      event.preventDefault();
+      setInstallPrompt(event as BeforeInstallPromptEvent);
+    };
+    window.addEventListener('beforeinstallprompt', onBeforeInstall);
+    return () => window.removeEventListener('beforeinstallprompt', onBeforeInstall);
+  }, []);
+
+  const handleInstallPwa = async () => {
+    if (!installPrompt) return;
+    await installPrompt.prompt();
+    await installPrompt.userChoice;
+    setInstallPrompt(null);
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-stone-100 text-stone-900">
       {/* Header estilo prototipo Yáanal Ka'an */}
-      <header className="bg-[#053b34] text-white shadow-sm">
+      <header className="bg-[#053b34] text-white shadow-sm print:hidden">
         <div className="mx-auto max-w-5xl px-4 pt-3.5">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-3">
@@ -53,17 +81,28 @@ export default function App() {
               </div>
             </div>
 
-            <button
-              type="button"
-              onClick={toggleSimulatedOffline}
-              className={`rounded-xl border px-3.5 py-1.5 text-xs font-semibold transition ${
-                simulatedOffline
-                  ? 'border-amber-300 bg-amber-400 text-stone-950 hover:bg-amber-300'
-                  : 'border-emerald-700 bg-emerald-900/70 text-emerald-50 hover:bg-emerald-800'
-              }`}
-            >
-              {simulatedOffline ? '✈ Modo Avión Activo (Desactivar)' : '✈ Simular Modo Avión'}
-            </button>
+            <div className="flex flex-wrap items-center gap-2">
+              {installPrompt && (
+                <button
+                  type="button"
+                  onClick={() => void handleInstallPwa()}
+                  className="rounded-xl border border-amber-300/60 bg-amber-400/15 px-3 py-1.5 text-xs font-semibold text-amber-200 hover:bg-amber-400/25"
+                >
+                  Instalar App
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={toggleSimulatedOffline}
+                className={`rounded-xl border px-3.5 py-1.5 text-xs font-semibold transition ${
+                  simulatedOffline
+                    ? 'border-amber-300 bg-amber-400 text-stone-950 hover:bg-amber-300'
+                    : 'border-emerald-700 bg-emerald-900/70 text-emerald-50 hover:bg-emerald-800'
+                }`}
+              >
+                {simulatedOffline ? '✈ Modo Avión Activo (Desactivar)' : '✈ Simular Modo Avión'}
+              </button>
+            </div>
           </div>
 
           {/* Barra de estado de sincronización y cola */}
@@ -144,6 +183,7 @@ export default function App() {
             isOnline={isOnline}
             isSyncing={isSyncing}
             pendingCount={pendingCount}
+            initialVerifyHash={initialVerifyHash}
             onSyncNow={() => void syncNow()}
           />
         )}
@@ -151,7 +191,7 @@ export default function App() {
         {activeTab === 'recruiter' && <RecruiterPortal isOnline={isOnline} />}
       </main>
 
-      <footer className="border-t border-stone-200 bg-white py-3 text-center text-xs text-stone-500">
+      <footer className="border-t border-stone-200 bg-white py-3 text-center text-xs text-stone-500 print:hidden">
         Yáanal Ka’an • Arquitectura PWA Offline-First · Hack Maya (DevFest Cancún 2026)
       </footer>
     </div>

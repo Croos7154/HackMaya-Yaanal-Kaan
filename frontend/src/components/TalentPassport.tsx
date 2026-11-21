@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { QRCodeSVG } from 'qrcode.react';
 import { db, updateStudentProfile } from '../db/indexedDb';
@@ -8,6 +8,7 @@ interface TalentPassportProps {
   isOnline: boolean;
   isSyncing: boolean;
   pendingCount: number;
+  initialVerifyHash?: string | null;
   onSyncNow: () => void;
 }
 
@@ -17,6 +18,7 @@ export function TalentPassport({
   isOnline,
   isSyncing,
   pendingCount,
+  initialVerifyHash,
   onSyncNow,
 }: TalentPassportProps) {
   const profiles = useLiveQuery(() => db.student_profile.toArray(), [], [] as StudentProfile[]);
@@ -38,13 +40,17 @@ export function TalentPassport({
   const [verifyResult, setVerifyResult] = useState<VerificationResult | null>(null);
 
   const activeHash = latestProgress?.validationHash ?? 'YK-PENDIENTE-SINCRONIZACION';
-  const qrPayload = JSON.stringify({
-    standard: 'OpenBadges-YK',
-    hash: activeHash,
-    candidate: student?.fullName ?? 'Carlos Pech',
-    community: student?.community ?? 'Felipe Carrillo Puerto, Q. Roo',
-    course: latestProgress?.courseTitle ?? 'En Formación',
-  });
+  const origin = typeof window !== 'undefined' ? window.location.origin : '';
+  const qrPayload =
+    activeHash !== 'YK-PENDIENTE-SINCRONIZACION' && origin
+      ? `${origin}/?verify=${encodeURIComponent(activeHash)}`
+      : JSON.stringify({
+          standard: 'OpenBadges-YK',
+          hash: activeHash,
+          candidate: student?.fullName ?? 'Carlos Pech',
+          community: student?.community ?? 'Felipe Carrillo Puerto, Q. Roo',
+          course: latestProgress?.courseTitle ?? 'En Formación',
+        });
 
   const handleOpenEdit = () => {
     setNameDraft(student?.fullName ?? '');
@@ -61,47 +67,56 @@ export function TalentPassport({
     setEditing(false);
   };
 
-  const handleVerifyCredential = async (hashToCheck: string) => {
-    if (hashToCheck === 'YK-PENDIENTE-SINCRONIZACION') {
-      setVerifyResult({
-        verified: false,
-        validation_hash: hashToCheck,
-      });
-      return;
-    }
+  const handleVerifyCredential = useCallback(
+    async (hashToCheck: string) => {
+      if (hashToCheck === 'YK-PENDIENTE-SINCRONIZACION') {
+        setVerifyResult({
+          verified: false,
+          validation_hash: hashToCheck,
+        });
+        return;
+      }
 
-    if (!isOnline) {
-      const localMatch = progressList.find((p) => p.validationHash === hashToCheck);
-      setVerifyResult({
-        verified: Boolean(localMatch),
-        validation_hash: hashToCheck,
-        candidate_name: student?.fullName,
-        community: student?.community,
-        course_title: localMatch?.courseTitle,
-        badge_name: localMatch?.badgeName,
-        score: localMatch?.score,
-        max_score: localMatch?.maxScore,
-        duration_seconds: localMatch?.durationSeconds,
-        completed_at: localMatch?.completedAt,
-      });
-      return;
-    }
+      if (!isOnline) {
+        const localMatch = progressList.find((p) => p.validationHash === hashToCheck);
+        setVerifyResult({
+          verified: Boolean(localMatch),
+          validation_hash: hashToCheck,
+          candidate_name: student?.fullName,
+          community: student?.community,
+          course_title: localMatch?.courseTitle,
+          badge_name: localMatch?.badgeName,
+          score: localMatch?.score,
+          max_score: localMatch?.maxScore,
+          duration_seconds: localMatch?.durationSeconds,
+          completed_at: localMatch?.completedAt,
+        });
+        return;
+      }
 
-    setVerifying(true);
-    try {
-      const res = await fetch(`${API_BASE}/api/v1/verify/${encodeURIComponent(hashToCheck)}`);
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const data = (await res.json()) as VerificationResult;
-      setVerifyResult(data);
-    } catch {
-      setVerifyResult({
-        verified: false,
-        validation_hash: hashToCheck,
-      });
-    } finally {
-      setVerifying(false);
+      setVerifying(true);
+      try {
+        const res = await fetch(`${API_BASE}/api/v1/verify/${encodeURIComponent(hashToCheck)}`);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = (await res.json()) as VerificationResult;
+        setVerifyResult(data);
+      } catch {
+        setVerifyResult({
+          verified: false,
+          validation_hash: hashToCheck,
+        });
+      } finally {
+        setVerifying(false);
+      }
+    },
+    [isOnline, progressList, student?.community, student?.fullName]
+  );
+
+  useEffect(() => {
+    if (initialVerifyHash) {
+      void handleVerifyCredential(initialVerifyHash);
     }
-  };
+  }, [initialVerifyHash, handleVerifyCredential]);
 
   return (
     <section className="space-y-5">
@@ -225,7 +240,7 @@ export function TalentPassport({
               {activeHash}
             </div>
 
-            <div className="flex flex-wrap items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2 print:hidden">
               <button
                 type="button"
                 disabled={verifying}
@@ -233,6 +248,13 @@ export function TalentPassport({
                 className="rounded-xl bg-[#0b4b42] px-4 py-2 text-xs font-semibold text-white hover:bg-[#083831] disabled:opacity-50"
               >
                 {verifying ? 'Verificando...' : 'Verificar Credencial'}
+              </button>
+              <button
+                type="button"
+                onClick={() => window.print()}
+                className="rounded-xl border border-stone-300 px-3.5 py-2 text-xs font-semibold text-stone-700 hover:bg-stone-50"
+              >
+                Imprimir / PDF
               </button>
               {pendingCount > 0 && (
                 <button

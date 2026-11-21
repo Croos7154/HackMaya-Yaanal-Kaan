@@ -71,6 +71,19 @@ export function OfflineClassroom({
     window.speechSynthesis.speak(utterance);
   };
 
+  const handleSpeakEnglishPhrase = (vocabItem: string) => {
+    if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
+    const phrase = vocabItem.split('=')[0].trim();
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(phrase);
+    utterance.lang = 'en-US';
+    utterance.rate = 0.88;
+    utterance.onend = () => setIsSpeaking(false);
+    utterance.onerror = () => setIsSpeaking(false);
+    setIsSpeaking(true);
+    window.speechSynthesis.speak(utterance);
+  };
+
   const handleSubmitQuiz = async () => {
     if (!activeCourse) return;
     let score = 0;
@@ -192,8 +205,21 @@ export function OfflineClassroom({
           <p className="mb-2 text-xs font-semibold text-stone-700">Vocabulario Clave</p>
           <ul className="grid gap-1.5 text-xs text-stone-700 sm:grid-cols-2">
             {activeCourse.lesson.key_vocabulary.map((item) => (
-              <li key={item} className="rounded-lg bg-white px-2.5 py-1.5 border border-stone-200">
-                {item}
+              <li
+                key={item}
+                className="flex items-center justify-between gap-2 rounded-lg border border-stone-200 bg-white px-2.5 py-1.5"
+              >
+                <span>{item}</span>
+                {activeCourse.id.includes('ingles') && (
+                  <button
+                    type="button"
+                    onClick={() => handleSpeakEnglishPhrase(item)}
+                    className="shrink-0 rounded-md bg-teal-50 px-2 py-0.5 text-[11px] font-semibold text-teal-800 hover:bg-teal-100"
+                    title="Escuchar pronunciación en inglés"
+                  >
+                    EN
+                  </button>
+                )}
               </li>
             ))}
           </ul>
