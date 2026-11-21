@@ -51,5 +51,3 @@ npm run preview
 
 ## Documentación de Entrega
 - [Propuesta Técnica](docs/PROPUESTA_TECNICA.md)
-- [Guion de Pitch (5 minutos)](docs/PITCH_5_MINUTOS.md)
-- [Checklist Final del Pitch](docs/CHECKLIST_PITCH.md)
