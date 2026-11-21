@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
+import { useLiveQuery } from 'dexie-react-hooks';
 import { CourseCatalog } from './components/CourseCatalog';
 import { OfflineClassroom } from './components/OfflineClassroom';
 import { RecruiterPortal } from './components/RecruiterPortal';
 import { TalentPassport } from './components/TalentPassport';
-import { ensureDefaultStudentProfile } from './db/indexedDb';
+import { db, ensureDefaultStudentProfile, resetLocalOfflineStorage } from './db/indexedDb';
 import { useOfflineSync } from './hooks/useOfflineSync';
 
 type ActiveTab = 'catalog' | 'classroom' | 'passport' | 'recruiter';
@@ -13,11 +14,11 @@ interface BeforeInstallPromptEvent extends Event {
   userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
 }
 
-const TABS: Array<{ id: ActiveTab; label: string }> = [
-  { id: 'catalog', label: '1. Rutas' },
-  { id: 'classroom', label: '2. Aula Offline' },
-  { id: 'passport', label: '3. Pasaporte' },
-  { id: 'recruiter', label: '4. Portal B2B' },
+const TABS: Array<{ id: ActiveTab; icon: string; label: string; shortLabel: string }> = [
+  { id: 'catalog', icon: '📦', label: '1. Catálogo de Rutas', shortLabel: '1. Rutas' },
+  { id: 'classroom', icon: '🎧', label: '2. Aula Offline', shortLabel: '2. Aula' },
+  { id: 'passport', icon: '🪪', label: '3. Pasaporte QR', shortLabel: '3. Pasaporte' },
+  { id: 'recruiter', icon: '🏨', label: '4. Portal B2B', shortLabel: '4. Portal B2B' },
 ];
 
 export default function App() {
@@ -30,6 +31,12 @@ export default function App() {
   );
   const [selectedCourseId, setSelectedCourseId] = useState<string | null>(null);
   const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
+  const [mode2G, setMode2G] = useState<boolean>(() => {
+    if (typeof window === 'undefined') return false;
+    return window.localStorage.getItem('yk_mode_2g') === '1';
+  });
+  const [judgeOpen, setJudgeOpen] = useState(false);
+
   const {
     isOnline,
     simulatedOffline,
@@ -40,9 +47,21 @@ export default function App() {
     syncNow,
   } = useOfflineSync();
 
+  const downloadedCourses = useLiveQuery(() => db.courses.toArray(), [], []);
+  const syncQueueItems = useLiveQuery(() => db.sync_queue.toArray(), [], []);
+
   useEffect(() => {
     void ensureDefaultStudentProfile();
   }, []);
+
+  useEffect(() => {
+    document.body.classList.toggle('mode-2g', mode2G);
+    try {
+      window.localStorage.setItem('yk_mode_2g', mode2G ? '1' : '0');
+    } catch {
+      // ignore storage errors
+    }
+  }, [mode2G]);
 
   useEffect(() => {
     const onBeforeInstall = (event: Event) => {
@@ -61,90 +80,116 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-stone-100 text-stone-900">
-      {/* Header estilo prototipo Yáanal Ka'an */}
-      <header className="bg-[#053b34] text-white shadow-sm print:hidden">
-        <div className="mx-auto max-w-5xl px-4 pt-3.5">
+    <div className="min-h-screen flex flex-col bg-[#eff5f3] text-[#0f2922]">
+      {/* Cabecera con greca maya y controles de red */}
+      <header className="sticky top-0 z-30 bg-gradient-to-br from-[#0f766e] via-[#0d9488] to-[#14b8a6] text-white shadow-md print:hidden">
+        <div className="mx-auto max-w-5xl px-4 pt-3 pb-3">
+          <div className="maya-fretwork mb-2.5" />
+
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-500/95 shadow-xs">
-                <img src="/icon.svg" alt="Yáanal Ka’an" className="h-7 w-7 rounded-md" />
+            <div className="flex items-center gap-2.5">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-amber-400 to-amber-500 text-sm font-black text-[#0f2922] shadow-sm">
+                YK
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <h1 className="text-base font-bold leading-tight text-white">Yáanal Ka’an</h1>
-                  <span className="rounded-md bg-white/15 px-1.5 py-0.5 text-[10px] font-bold tracking-wider">
+                  <h1 className="text-base font-extrabold tracking-tight text-white">
+                    Yáanal Ka&apos;an
+                  </h1>
+                  <span className="rounded-md bg-white/15 px-1.5 py-0.5 text-[10px] font-bold">
                     PWA
                   </span>
                 </div>
-                <p className="text-xs text-emerald-200">Bajo el mismo cielo • Offline-First</p>
+                <p className="text-[11px] font-medium text-teal-100">
+                  Bajo el mismo cielo · Offline-First
+                </p>
               </div>
             </div>
 
-            <div className="flex flex-wrap items-center gap-2">
+            <span
+              className={`rounded-full border px-3 py-1 text-xs font-extrabold ${
+                pendingCount > 0
+                  ? 'border-amber-200 bg-amber-400 text-[#0f2922]'
+                  : 'border-white/30 bg-white/15 text-white'
+              }`}
+            >
+              Cola: {pendingCount}
+            </span>
+          </div>
+
+          <div className="mt-2.5 flex flex-wrap items-center justify-between gap-2">
+            <div
+              className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-bold ${
+                !isOnline
+                  ? 'border-amber-400 bg-amber-100 text-amber-900'
+                  : 'border-white/30 bg-white/15 text-white'
+              }`}
+            >
+              <span
+                className={`h-2 w-2 rounded-full ${
+                  isOnline ? 'bg-emerald-300 shadow-[0_0_6px_#34d399]' : 'bg-amber-500'
+                }`}
+              />
+              <span>
+                {!isOnline ? 'Modo Sin Conexión · 0 ms' : 'En Línea · Sync Activo'}
+              </span>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-1.5">
               {installPrompt && (
                 <button
                   type="button"
                   onClick={() => void handleInstallPwa()}
-                  className="rounded-xl border border-amber-300/60 bg-amber-400/15 px-3 py-1.5 text-xs font-semibold text-amber-200 hover:bg-amber-400/25"
+                  className="rounded-full border border-amber-300/70 bg-amber-400/20 px-2.5 py-1 text-[11px] font-bold text-amber-100 hover:bg-amber-400/30"
                 >
                   Instalar App
                 </button>
               )}
               <button
                 type="button"
-                onClick={toggleSimulatedOffline}
-                className={`rounded-xl border px-3.5 py-1.5 text-xs font-semibold transition ${
-                  simulatedOffline
-                    ? 'border-amber-300 bg-amber-400 text-stone-950 hover:bg-amber-300'
-                    : 'border-emerald-700 bg-emerald-900/70 text-emerald-50 hover:bg-emerald-800'
+                onClick={() => setMode2G((prev) => !prev)}
+                className={`rounded-full border px-2.5 py-1 text-[11px] font-bold transition ${
+                  mode2G
+                    ? 'border-stone-900 bg-stone-900 text-white'
+                    : 'border-white/35 bg-white/15 text-white hover:bg-white/25'
                 }`}
               >
-                {simulatedOffline ? '✈ Modo Avión Activo (Desactivar)' : '✈ Simular Modo Avión'}
+                {mode2G ? '2G/3G: ON' : '2G/3G: OFF'}
+              </button>
+              <button
+                type="button"
+                onClick={toggleSimulatedOffline}
+                className={`rounded-full border px-3 py-1 text-[11px] font-bold transition ${
+                  simulatedOffline
+                    ? 'border-amber-200 bg-amber-400 text-[#0f2922]'
+                    : 'border-white/35 bg-white/15 text-white hover:bg-white/25'
+                }`}
+              >
+                {simulatedOffline ? '✈ Avión: ON' : '✈ Modo Avión'}
               </button>
             </div>
           </div>
 
-          {/* Barra de estado de sincronización y cola */}
-          <div className="mt-3 flex flex-wrap items-center justify-between gap-2 border-t border-white/10 pt-2.5 text-xs">
-            <div className="flex items-center gap-2">
-              <span
-                className={`h-2 w-2 rounded-full ${
-                  isOnline ? 'bg-emerald-400' : 'bg-amber-400'
-                }`}
-              />
-              <span className="font-medium text-emerald-50">
-                {!isOnline
-                  ? 'Modo Avión (Offline) • Guardado local activo'
-                  : isSyncing
-                    ? 'Sincronizando con PostgreSQL...'
-                    : pendingCount > 0
-                      ? 'En Línea • Sincronización pendiente'
-                      : 'En Línea • Sincronizado'}
-              </span>
-            </div>
-
-            <span className="rounded-full bg-black/25 px-3 py-0.5 text-[11px] font-semibold text-amber-200">
-              {pendingCount} evento(s) en cola
-            </span>
-          </div>
-
-          {/* Navegación principal 4 vistas */}
-          <nav className="mt-2.5 flex gap-1 overflow-x-auto">
+          {/* Navegación Desktop */}
+          <nav
+            aria-label="Navegación principal"
+            className="mt-3 hidden grid-cols-4 gap-2 border-t border-white/20 pt-3 md:grid"
+          >
             {TABS.map((tab) => {
-              const isActive = activeTab === tab.id;
+              const active = activeTab === tab.id;
               return (
                 <button
                   key={tab.id}
                   type="button"
                   onClick={() => setActiveTab(tab.id)}
-                  className={`flex-1 min-w-max border-b-2 px-3 py-2.5 text-xs font-semibold transition ${
-                    isActive
-                      ? 'border-amber-400 bg-white/10 text-white'
-                      : 'border-transparent text-emerald-100/80 hover:bg-white/5 hover:text-white'
+                  className={`flex items-center justify-center gap-2 rounded-xl border px-3 py-2 text-xs font-extrabold transition ${
+                    active
+                      ? 'border-white bg-white text-[#0f766e] shadow-sm'
+                      : 'border-white/25 bg-white/10 text-white hover:bg-white/20'
                   }`}
                 >
-                  {tab.label}
+                  <span>{tab.icon}</span>
+                  <span>{tab.label}</span>
                 </button>
               );
             })}
@@ -152,9 +197,18 @@ export default function App() {
         </div>
       </header>
 
-      <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-6 space-y-4">
+      {/* Banner de reconciliación automática */}
+      {isSyncing && (
+        <div className="bg-gradient-to-r from-emerald-800 to-emerald-700 px-4 py-2 text-xs font-bold text-white print:hidden">
+          <div className="mx-auto max-w-5xl">
+            Reconciliando {pendingCount} evento(s) con POST /api/v1/sync...
+          </div>
+        </div>
+      )}
+
+      <main className="mx-auto w-full max-w-5xl flex-1 px-4 pt-5 pb-28 md:pb-8 space-y-4">
         {lastError && (
-          <div className="rounded-xl border border-amber-300 bg-amber-50 px-4 py-2.5 text-xs text-amber-900">
+          <div className="rounded-xl border border-amber-300 bg-amber-50 px-4 py-2.5 text-xs text-amber-900 print:hidden">
             Sincronización diferida ({lastError}). Los datos siguen seguros en `sync_queue`.
           </div>
         )}
@@ -191,9 +245,79 @@ export default function App() {
         {activeTab === 'recruiter' && <RecruiterPortal isOnline={isOnline} />}
       </main>
 
-      <footer className="border-t border-stone-200 bg-white py-3 text-center text-xs text-stone-500 print:hidden">
-        Yáanal Ka’an • Arquitectura PWA Offline-First · Hack Maya (DevFest Cancún 2026)
-      </footer>
+      {/* Inspector Técnico Desplegable (Modo Juez) */}
+      <div className="sticky bottom-16 md:bottom-0 z-30 border-t-2 border-amber-500 bg-slate-900 text-slate-200 print:hidden">
+        <div className="mx-auto max-w-5xl">
+          <button
+            type="button"
+            onClick={() => setJudgeOpen((prev) => !prev)}
+            className="flex w-full items-center justify-between px-4 py-2 text-xs font-bold"
+          >
+            <span>🛠 Inspector Técnico (IndexedDB · sync_queue)</span>
+            <span>{judgeOpen ? '▼ Ocultar JSON' : '▲ Ver JSON'}</span>
+          </button>
+
+          {judgeOpen && (
+            <div className="max-h-56 overflow-y-auto border-t border-slate-700 px-4 py-3 text-xs">
+              <div className="mb-2 flex items-center justify-between">
+                <span>
+                  Latencia Offline: <strong className="text-emerald-400">0 ms</strong>
+                </span>
+                <button
+                  type="button"
+                  onClick={() => void resetLocalOfflineStorage()}
+                  className="rounded-lg border border-slate-600 px-2.5 py-1 text-[11px] font-bold text-slate-200 hover:bg-slate-800"
+                >
+                  Limpiar IDB
+                </button>
+              </div>
+              <pre className="overflow-x-auto rounded-lg bg-slate-950 p-2.5 font-mono text-[11px] text-emerald-400">
+                {JSON.stringify(
+                  {
+                    db: 'yaanal_kaan_offline_db (Dexie / IndexedDB)',
+                    offline: !isOnline,
+                    mode_2g: mode2G,
+                    downloaded_packages: downloadedCourses.map((c) => ({
+                      id: c.id,
+                      version: c.version,
+                      size_kb: c.size_kb,
+                    })),
+                    sync_queue: syncQueueItems,
+                  },
+                  null,
+                  2
+                )}
+              </pre>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Barra inferior móvil */}
+      <nav
+        aria-label="Navegación móvil"
+        className="fixed bottom-0 left-0 right-0 z-40 grid h-16 grid-cols-4 border-t border-teal-100 bg-white shadow-[0_-2px_10px_rgba(15,41,34,0.06)] md:hidden print:hidden"
+      >
+        {TABS.map((tab) => {
+          const active = activeTab === tab.id;
+          return (
+            <button
+              key={tab.id}
+              type="button"
+              onClick={() => setActiveTab(tab.id)}
+              className={`relative flex flex-col items-center justify-center gap-0.5 text-[11px] font-extrabold transition ${
+                active ? 'bg-teal-50 text-[#0f766e]' : 'text-stone-500'
+              }`}
+            >
+              {active && (
+                <span className="absolute top-0 left-1/4 right-1/4 h-0.5 rounded-b bg-[#0d9488]" />
+              )}
+              <span>{tab.icon}</span>
+              <span>{tab.shortLabel}</span>
+            </button>
+          );
+        })}
+      </nav>
     </div>
   );
 }

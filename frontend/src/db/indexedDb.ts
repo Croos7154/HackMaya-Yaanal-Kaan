@@ -91,6 +91,16 @@ export async function removeCourseAssetsOffline(courseId: string): Promise<void>
   await db.courses.delete(courseId);
 }
 
+export async function resetLocalOfflineStorage(): Promise<void> {
+  await db.transaction('rw', db.courses, db.progress, db.sync_queue, db.student_profile, async () => {
+    await db.courses.clear();
+    await db.progress.clear();
+    await db.sync_queue.clear();
+    await db.student_profile.clear();
+    await db.student_profile.put(DEFAULT_STUDENT);
+  });
+}
+
 export async function computeValidationHash(payload: string): Promise<string> {
   if (globalThis.crypto?.subtle) {
     const encoded = new TextEncoder().encode(payload);

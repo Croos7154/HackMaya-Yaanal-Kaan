@@ -128,7 +128,7 @@ def test_candidates_filters_and_analytics(client: TestClient):
     assert filtered.status_code == 200
     data = filtered.json()
     assert len(data) == 1
-    assert data[0]["full_name"] == "María Xool"
+    assert data[0]["full_name"] == "María Ixchel Chan"
 
     analytics = client.get("/api/v1/analytics")
     assert analytics.status_code == 200

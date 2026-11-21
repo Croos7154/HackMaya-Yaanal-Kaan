@@ -121,7 +121,8 @@ export function TalentPassport({
   return (
     <section className="space-y-5">
       {/* Tarjeta principal de Pasaporte de Talento */}
-      <div className="rounded-3xl bg-gradient-to-br from-[#043630] via-[#084d44] to-[#0f6457] p-6 text-white shadow-sm">
+      <div className="passport-card-surface rounded-3xl bg-gradient-to-br from-[#0f766e] via-[#0d9488] to-[#064e3b] p-6 text-white shadow-sm">
+        <div className="maya-fretwork mb-4" />
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
             <span className="text-[11px] font-bold uppercase tracking-widest text-amber-300">

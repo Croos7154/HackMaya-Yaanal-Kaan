@@ -67,6 +67,61 @@ class LessonSchema(BaseModel):
     key_vocabulary: List[str] = Field(default_factory=list)
 
 
+class BilingualPhraseSchema(BaseModel):
+    main: str
+    es: str
+    yua: str
+
+
+class BuilderChallengeSchema(BaseModel):
+    title: str
+    prompt_es: str
+    prompt_yua: str
+    tiles: List[str]
+    expected: List[str]
+    ok_msg: str
+    err_msg: str
+
+
+class MatchPairSchema(BaseModel):
+    id: int
+    es: str
+    yua: str
+    target: str
+
+
+class ListenChallengeSchema(BaseModel):
+    title: str
+    audio_text: str
+    question_es: str
+    question_yua: str
+    options: List[str]
+    correct_index: int
+    ok_msg: str
+
+
+class ExamChallengeSchema(BaseModel):
+    type: str  # "order" | "choice"
+    label_es: str
+    label_yua: str
+    tiles: List[str] = Field(default_factory=list)
+    expected: List[str] = Field(default_factory=list)
+    options: List[str] = Field(default_factory=list)
+    correct: Optional[int] = None
+
+
+class InteractiveUnitSchema(BaseModel):
+    subtitle: str
+    speech_lang: str = "en-US"
+    vocab_title: str
+    vocab_desc: str
+    phrases: List[BilingualPhraseSchema]
+    builder: BuilderChallengeSchema
+    pairs: List[MatchPairSchema]
+    listen: ListenChallengeSchema
+    exam: List[ExamChallengeSchema]
+
+
 class CoursePackageSchema(BaseModel):
     id: str
     version: str = "1.0.0"
@@ -78,9 +133,11 @@ class CoursePackageSchema(BaseModel):
     module_count: int = 5
     estimated_minutes: int
     size_kb: int
+    video_compare_mb: int = 45
     description: str
     lesson: LessonSchema
     quiz: List[QuizQuestionSchema]
+    interactive_unit: Optional[InteractiveUnitSchema] = None
 
 
 class SyncEventItem(BaseModel):

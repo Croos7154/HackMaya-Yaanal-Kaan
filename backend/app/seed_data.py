@@ -8,18 +8,19 @@ from .models import CandidateRecord, CertificationRecord, CoursePackageSchema
 COURSES_CATALOG: list[CoursePackageSchema] = [
     CoursePackageSchema(
         id="ingles-turismo-01",
-        version="1.0.0",
+        version="1.1.0",
         title="Inglés Básico para Turismo",
         maya_title="Kaambal Ingles utia'al Xíimbal",
         skill_tag="Inglés Turístico",
         badge_name="Anfitrión Bilingüe Maya-Caribe",
         level="Básico",
         module_count=5,
-        estimated_minutes=12,
+        estimated_minutes=15,
         size_kb=28,
+        video_compare_mb=45,
         description=(
-            "Atención cordial al visitante, saludos, indicaciones básicas y hospitalidad "
-            "comunitaria en cenotes y paradores sin depender de conexión."
+            "Saludos, recepción de huéspedes, indicaciones y cortesía básica con audio "
+            "bilingüe Español / Maayat'aan sin depender de conexión."
         ),
         lesson={
             "id": "les-ingles-01",
@@ -28,64 +29,149 @@ COURSES_CATALOG: list[CoursePackageSchema] = [
             "body_text": (
                 "En el turismo comunitario, los primeros 30 segundos generan confianza. "
                 "Usa frases cortas y claras en inglés acompañadas de tu identidad local: "
-                "1) 'Welcome to our community!' (¡Bienvenido a nuestra comunidad!). "
-                "2) 'The entrance fee is 200 pesos.' (La entrada cuesta 200 pesos). "
-                "3) 'Please wear a life vest before entering the cenote.' "
-                "(Por favor use chaleco salvavidas antes de entrar al cenote). "
-                "Practica escuchar el ritmo pausado usando el botón de lectura en voz alta."
+                "1) 'Welcome to our hotel!' (¡Bienvenido a nuestro hotel!). "
+                "2) 'Can I help you with your luggage?' (¿Puedo ayudarle con su equipaje?). "
+                "3) 'Your room is on the second floor.' (Su habitación está en el segundo piso)."
             ),
             "speech_script": (
                 "Lección 1: Inglés Básico para Turismo. "
-                "Para dar la bienvenida di: Welcome to our community. "
-                "Para indicar el precio de entrada di: The entrance fee is two hundred pesos. "
-                "Para cuidar la seguridad en el cenote di: Please wear a life vest before entering the cenote."
+                "Para dar la bienvenida di: Welcome to our hotel. "
+                "Para ofrecer ayuda di: Can I help you with your luggage. "
+                "Para indicar la habitación di: Your room is on the second floor."
             ),
             "key_vocabulary": [
-                "Welcome = Bienvenido / Ki'imak óolal",
-                "Entrance fee = Costo de entrada",
-                "Life vest = Chaleco salvavidas",
-                "Follow me, please = Sígame, por favor",
+                "Welcome = Bienvenido / K'ambe'enil",
+                "Thank you = Muchas gracias / Dios bo'otik",
+                "Room = Habitación / Najil wenel",
+                "Luggage = Equipaje / Kuuch",
             ],
         },
         quiz=[
             {
                 "id": "q-ing-1",
-                "prompt": "¿Cómo das la bienvenida a un visitante al llegar al parador turístico?",
+                "prompt": "¿Cómo das la bienvenida a un huésped al llegar?",
                 "options": [
                     "Where is the bus station?",
-                    "Welcome to our community!",
-                    "The store is closed today.",
+                    "Welcome to our hotel.",
+                    "The restaurant is closed today.",
                 ],
                 "correct_index": 1,
-                "explanation": "'Welcome to our community!' transmite hospitalidad clara desde el primer contacto.",
+                "explanation": "'Welcome to our hotel.' transmite hospitalidad clara desde el primer contacto.",
             },
             {
                 "id": "q-ing-2",
-                "prompt": "¿Qué frase indica correctamente que el acceso cuesta 200 pesos?",
+                "prompt": "Un huésped llega con maletas pesadas. ¿Qué le dices?",
                 "options": [
-                    "The entrance fee is 200 pesos.",
-                    "My name is 200 pesos.",
-                    "Please swim fast now.",
+                    "Can I help you with your luggage?",
+                    "Please wait outside.",
+                    "I do not speak English.",
                 ],
                 "correct_index": 0,
-                "explanation": "'Entrance fee' significa tarifa o costo de entrada.",
+                "explanation": "'Can I help you with your luggage?' ofrece asistencia cordial.",
             },
             {
                 "id": "q-ing-3",
-                "prompt": "Antes de entrar al agua del cenote, ¿qué instrucción de seguridad debes dar?",
+                "prompt": "Despedida cordial al entregar la llave de la habitación:",
                 "options": [
-                    "Please leave your shoes on the roof.",
-                    "Please wear a life vest before entering the cenote.",
-                    "Do not look at the water.",
+                    "Please leave your shoes outside.",
+                    "Thank you very much, enjoy your stay.",
+                    "Do not look at the cenote.",
                 ],
                 "correct_index": 1,
-                "explanation": "'Wear a life vest' indica usar chaleco salvavidas para proteger al visitante.",
+                "explanation": "'Enjoy your stay' desea una feliz estadía al visitante.",
             },
         ],
+        interactive_unit={
+            "subtitle": "Unidad 1 · Atención al Huésped",
+            "speech_lang": "en-US",
+            "vocab_title": "Paso 1 · Vocabulario Clave de Recepción",
+            "vocab_desc": "Toca cualquier tarjeta o usa los controles para escuchar y pausar la pronunciación sin internet.",
+            "phrases": [
+                {
+                    "main": "Welcome to our hotel.",
+                    "es": "Bienvenido a nuestro hotel.",
+                    "yua": "K'ambe'enil ichil k-hotel.",
+                },
+                {
+                    "main": "Can I help you with your luggage?",
+                    "es": "¿Puedo ayudarle con su equipaje?",
+                    "yua": "Je'el u páajtal in wáantikech yéetel a kuuche'.",
+                },
+                {
+                    "main": "Your room is on the second floor.",
+                    "es": "Su habitación está en el segundo piso.",
+                    "yua": "A najil wenel ti’ yaan tu ka’a píiso.",
+                },
+                {
+                    "main": "Thank you very much, enjoy your stay.",
+                    "es": "Muchas gracias, disfrute su estadía.",
+                    "yua": "Dios bo'otik, ki'imakchajak a wóol waye'.",
+                },
+            ],
+            "builder": {
+                "title": "Paso 2 · Ordena la Oración",
+                "prompt_es": "Ordena las fichas para decir: \"¿Puedo ayudarle?\"",
+                "prompt_yua": "Ts’áa tu tsoolil: \"¿Je’el u páajtal in wáantikech?\"",
+                "tiles": ["you", "Can", "?", "help", "I"],
+                "expected": ["Can", "I", "help", "you", "?"],
+                "ok_msg": "\"Can I help you?\" es correcto.",
+                "err_msg": "Orden incorrecto (-1 vida). Pista: empieza con \"Can I...\".",
+            },
+            "pairs": [
+                {"id": 0, "es": "Bienvenido", "yua": "K'ambe'enil", "target": "Welcome"},
+                {"id": 1, "es": "Muchas gracias", "yua": "Dios bo'otik", "target": "Thank you"},
+                {"id": 2, "es": "Habitación", "yua": "Najil wenel", "target": "Room"},
+                {"id": 3, "es": "Equipaje", "yua": "Kuuch", "target": "Luggage"},
+            ],
+            "listen": {
+                "title": "Paso 4 · Escucha y Comprende",
+                "audio_text": "Your room is on the second floor.",
+                "question_es": "Escucha el audio offline y elige lo que indica el recepcionista:",
+                "question_yua": "U’uy le t’aano’ ka a yéey ba’ax ku ya’alik:",
+                "options": [
+                    "Su habitación está en el segundo piso.",
+                    "El desayuno se sirve a las ocho.",
+                    "La playa está cruzando la calle.",
+                ],
+                "correct_index": 0,
+                "ok_msg": "\"Your room is on the second floor.\"",
+            },
+            "exam": [
+                {
+                    "type": "order",
+                    "label_es": "Reto 1/3 · Forma la bienvenida oficial en inglés:",
+                    "label_yua": "1/3 · Beet le k’ambe’enil ich inglés:",
+                    "tiles": ["hotel", "our", "to", "Welcome"],
+                    "expected": ["Welcome", "to", "our", "hotel"],
+                },
+                {
+                    "type": "choice",
+                    "label_es": "Reto 2/3 · Un huésped llega con maletas pesadas. ¿Qué le dices?",
+                    "label_yua": "2/3 · K’uch juntúul u’ulab yéetel aal kuuch. ¿Ba’ax ka wa’alikti’?",
+                    "options": [
+                        "Can I help you with your luggage?",
+                        "Where is the bus station?",
+                        "The restaurant is closed today.",
+                    ],
+                    "correct": 0,
+                },
+                {
+                    "type": "choice",
+                    "label_es": "Reto 3/3 · Despedida cordial al entregar la llave:",
+                    "label_yua": "3/3 · T’aan utia’al a ts’áaik u llaveil naj:",
+                    "options": [
+                        "Please wait outside.",
+                        "Thank you very much, enjoy your stay.",
+                        "I do not speak English.",
+                    ],
+                    "correct": 1,
+                },
+            ],
+        },
     ),
     CoursePackageSchema(
         id="finanzas-artesanos-01",
-        version="1.0.0",
+        version="1.1.0",
         title="Finanzas para Artesanos",
         maya_title="Kalan Taak'in utia'al Meyajil K'ab",
         skill_tag="Finanzas y Costeo",
@@ -94,9 +180,10 @@ COURSES_CATALOG: list[CoursePackageSchema] = [
         module_count=4,
         estimated_minutes=15,
         size_kb=31,
+        video_compare_mb=38,
         description=(
-            "Aprende a calcular el costo real de tus materiales, horas de bordado o tallado "
-            "y margen justo para vender sin perder dinero en ferias y mercados."
+            "Cálculo de costos de materiales, fijación de precios justos y control de ganancias "
+            "para cooperativas y talleres locales sin conexión."
         ),
         lesson={
             "id": "les-fin-01",
@@ -105,21 +192,18 @@ COURSES_CATALOG: list[CoursePackageSchema] = [
             "body_text": (
                 "Muchos artesanos cobran solo el precio del hilo o la madera y olvidan sumar su tiempo. "
                 "Para fijar un precio justo aplica esta fórmula simple: "
-                "Precio Justo = Materiales + Mano de Obra + Margen de Ahorro (20%). "
-                "Por ejemplo, si un hipil bordado usa 350 pesos en tela e hilos, requiere 450 pesos por tus horas de trabajo "
-                "y agregas 160 pesos de utilidad para reinvertir, su precio mínimo debe ser 960 pesos. "
-                "Separa el dinero de reposición de materiales antes de gastar la ganancia."
+                "Precio Justo = Materiales + Mano de Obra + Margen de Ganancia."
             ),
             "speech_script": (
                 "Lección 1: Finanzas para Artesanos. "
                 "Nunca vendas solo al costo del material. "
-                "Suma tres partes: el costo de tus materiales, el pago por tus horas de trabajo, y un margen de ahorro del veinte por ciento para hacer crecer tu taller."
+                "Suma tres partes: materiales, mano de obra y un margen de ganancia para reinvertir."
             ),
             "key_vocabulary": [
-                "Costo directo = Tela, hilo, madera o barro",
-                "Mano de obra = Valor de tus horas de trabajo",
-                "Utilidad = Ganancia para ahorrar o reinvertir",
-                "Punto de equilibrio = Venta mínima para no perder",
+                "Costo Directo = Hilo, madera y tintes",
+                "Mano de Obra = Horas de bordado",
+                "Ganancia Neta = Dinero libre tras gastos",
+                "Reinversión = Fondo del 20% por venta",
             ],
         },
         quiz=[
@@ -128,35 +212,122 @@ COURSES_CATALOG: list[CoursePackageSchema] = [
                 "prompt": "¿Cuáles son los tres componentes de un precio artesanal justo?",
                 "options": [
                     "Solo el costo del transporte",
-                    "Materiales + Mano de Obra + Margen de Utilidad",
+                    "Materiales + Mano de Obra + Ganancia",
                     "El precio que diga el primer comprador",
                 ],
                 "correct_index": 1,
-                "explanation": "Tu tiempo y esfuerzo tienen valor económico y deben sumarse junto a los materiales y utilidad.",
+                "explanation": "Tu tiempo y esfuerzo tienen valor económico y deben sumarse junto a los materiales.",
             },
             {
                 "id": "q-fin-2",
-                "prompt": "Si gastaste $300 en materiales y tu trabajo vale $400, ¿por qué no debes vender la pieza en $500?",
+                "prompt": "Un hotel pide 20 caminos de mesa con 15% de descuento. ¿Qué revisas primero?",
                 "options": [
-                    "Porque perderías $200 respecto al valor real de tu trabajo y materiales",
-                    "Porque los billetes de $500 no sirven en ferias",
-                    "Porque el cliente siempre quiere pagar el doble",
+                    "Que el precio final siga cubriendo materiales, mano de obra y ganancia.",
+                    "Aceptar cualquier precio aunque pierda dinero.",
+                    "No anotar los gastos de transporte.",
                 ],
                 "correct_index": 0,
-                "explanation": "Vender debajo de tus costos totales ($700) descapitaliza tu taller.",
+                "explanation": "Vender debajo de tus costos totales descapitaliza tu taller.",
             },
             {
                 "id": "q-fin-3",
-                "prompt": "¿Qué debes hacer primero al cobrar una venta artesanal?",
+                "prompt": "¿Para qué sirve apartar el 20% de cada venta en un fondo?",
                 "options": [
-                    "Gastar todo el efectivo el mismo día",
-                    "Separar el dinero para reponer materiales antes de usar la ganancia",
-                    "Regalar el cambio sin anotar la venta",
+                    "Para gastarlo el mismo día en cosas personales.",
+                    "Para reponer hilos y materiales sin endeudarse.",
+                    "Para no llevar registro en libreta.",
                 ],
                 "correct_index": 1,
-                "explanation": "Apartar la reposición de insumos garantiza que siempre puedas producir la siguiente pieza.",
+                "explanation": "El fondo de reinversión garantiza insumos para la siguiente producción.",
             },
         ],
+        interactive_unit={
+            "subtitle": "Unidad 1 · Costeo y Precio Justo",
+            "speech_lang": "es-MX",
+            "vocab_title": "Paso 1 · Conceptos Clave del Taller",
+            "vocab_desc": "Aprende a separar tus materiales, tu tiempo de bordado o tallado y tu ganancia neta sin internet.",
+            "phrases": [
+                {
+                    "main": "Costo de Materiales = Hilo + Tela + Tintes",
+                    "es": "Todo insumo que compras para elaborar una pieza es costo directo.",
+                    "yua": "Tuláakal ba'ax ka manik utia'al a beetik junp'éel meyaj.",
+                },
+                {
+                    "main": "Mano de Obra = Horas trabajadas × Valor por hora",
+                    "es": "Tu tiempo y conocimiento artesanal deben pagarse como un sueldo justo.",
+                    "yua": "A k'iin yéetel a na'at k'a'abéet u bo'ota'al ma'alob.",
+                },
+                {
+                    "main": "Precio de Venta = Costo Total + Margen de Ganancia",
+                    "es": "Nunca vendas por debajo de tu costo; agrega al menos 30% de margen.",
+                    "yua": "Ma' a konik tu yáanal u tojol; ts'áa u náajalil.",
+                },
+                {
+                    "main": "Fondo de Reinversión = 20% de cada venta",
+                    "es": "Guarda una parte para comprar materia prima sin pedir prestado.",
+                    "yua": "Ta'ak junxéet' taak'in utia'al a manik nu'ukul.",
+                },
+            ],
+            "builder": {
+                "title": "Paso 2 · Arma la Fórmula del Precio Justo",
+                "prompt_es": "Ordena las fichas para formar la ecuación correcta de venta:",
+                "prompt_yua": "Ts’áa tu tsoolil bix u jóok’ol u tojol le meyajo’:",
+                "tiles": ["Ganancia", "Materiales", "+", "Mano de Obra", "+"],
+                "expected": ["Materiales", "+", "Mano de Obra", "+", "Ganancia"],
+                "ok_msg": "¡Exacto! Materiales + Mano de Obra + Ganancia = Precio Justo.",
+                "err_msg": "Orden incorrecto (-1 vida). Empieza sumando \"Materiales + Mano de Obra...\".",
+            },
+            "pairs": [
+                {"id": 0, "es": "Hilo, madera y tintes", "yua": "Nu’ukul meyaj", "target": "Costo Directo"},
+                {"id": 1, "es": "Horas de bordado", "yua": "K’iin meyaj", "target": "Mano de Obra"},
+                {"id": 2, "es": "Dinero libre tras gastos", "yua": "Náajalil", "target": "Ganancia Neta"},
+                {"id": 3, "es": "Ahorro para insumos", "yua": "Ta’ak’in", "target": "Reinversión"},
+            ],
+            "listen": {
+                "title": "Paso 4 · Caso Práctico en Audio",
+                "audio_text": "Si gastas ciento veinte pesos en hilos y ochenta en mano de obra, tu costo base es doscientos pesos.",
+                "question_es": "Escucha el caso del taller y calcula cuál es el costo base de la pieza:",
+                "question_yua": "U’uy le ejemplo yéetel ilawil bajux u costo base:",
+                "options": [
+                    "$200 pesos ($120 materiales + $80 mano de obra)",
+                    "$120 pesos (solo contar los hilos)",
+                    "$80 pesos (solo contar el tiempo)",
+                ],
+                "correct_index": 0,
+                "ok_msg": "Costo base = $200 MXN. Sobre eso se suma el margen de ganancia.",
+            },
+            "exam": [
+                {
+                    "type": "order",
+                    "label_es": "Reto 1/3 · Ordena la regla básica de control financiero:",
+                    "label_yua": "1/3 · Ts’áa tu tsoolil bix u kanáanta’al taak’in:",
+                    "tiles": ["del taller", "Separar", "personal", "el dinero"],
+                    "expected": ["Separar", "el dinero", "del taller", "personal"],
+                },
+                {
+                    "type": "choice",
+                    "label_es": "Reto 2/3 · Un hotel te pide 20 caminos de mesa con 15% de descuento. ¿Qué revisas primero?",
+                    "label_yua": "2/3 · Junp’éel hotel u k’áat 20 meyajo’ob yéetel descuento. ¿Ba’ax ka wilik táanil?",
+                    "options": [
+                        "Que el precio final siga cubriendo materiales, mano de obra y ganancia.",
+                        "Aceptar cualquier precio aunque pierda dinero.",
+                        "No anotar los gastos de transporte.",
+                    ],
+                    "correct": 0,
+                },
+                {
+                    "type": "choice",
+                    "label_es": "Reto 3/3 · ¿Para qué sirve apartar el 20% de cada venta en un fondo?",
+                    "label_yua": "3/3 · ¿Ba’axten ma’alob u ta’aka’al 20% ti’ cada koonol?",
+                    "options": [
+                        "Para gastarlo el mismo día en cosas personales.",
+                        "Para reponer hilos y materiales sin endeudarse.",
+                        "Para no llevar registro en libreta.",
+                    ],
+                    "correct": 1,
+                },
+            ],
+        },
     ),
 ]
 
@@ -171,14 +342,14 @@ def seed_database(db: Session) -> None:
     seed_candidates = [
         CandidateRecord(
             id="cand-maria-pm",
-            full_name="María Xool",
+            full_name="María Ixchel Chan",
             community="Puerto Morelos, Q. Roo",
             primary_language="Español • Maya • Inglés Básico",
             created_at=now - timedelta(days=5),
         ),
         CandidateRecord(
             id="cand-joseluis-fcp",
-            full_name="José Luis Balam",
+            full_name="José Guadalupe May",
             community="Felipe Carrillo Puerto, Q. Roo",
             primary_language="Español • Maya",
             created_at=now - timedelta(days=4),

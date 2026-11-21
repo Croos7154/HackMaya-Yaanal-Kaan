@@ -1,4 +1,5 @@
 export type SyncStatus = 'pending' | 'synced';
+export type ClassroomLanguage = 'es' | 'yua';
 
 export interface QuizQuestion {
   id: string;
@@ -17,6 +18,61 @@ export interface Lesson {
   key_vocabulary: string[];
 }
 
+export interface BilingualPhrase {
+  main: string;
+  es: string;
+  yua: string;
+}
+
+export interface BuilderChallenge {
+  title: string;
+  prompt_es: string;
+  prompt_yua: string;
+  tiles: string[];
+  expected: string[];
+  ok_msg: string;
+  err_msg: string;
+}
+
+export interface MatchPair {
+  id: number;
+  es: string;
+  yua: string;
+  target: string;
+}
+
+export interface ListenChallenge {
+  title: string;
+  audio_text: string;
+  question_es: string;
+  question_yua: string;
+  options: string[];
+  correct_index: number;
+  ok_msg: string;
+}
+
+export interface ExamChallenge {
+  type: 'order' | 'choice';
+  label_es: string;
+  label_yua: string;
+  tiles: string[];
+  expected: string[];
+  options: string[];
+  correct?: number | null;
+}
+
+export interface InteractiveUnit {
+  subtitle: string;
+  speech_lang: string;
+  vocab_title: string;
+  vocab_desc: string;
+  phrases: BilingualPhrase[];
+  builder: BuilderChallenge;
+  pairs: MatchPair[];
+  listen: ListenChallenge;
+  exam: ExamChallenge[];
+}
+
 export interface CoursePackage {
   id: string;
   version: string;
@@ -28,9 +84,11 @@ export interface CoursePackage {
   module_count: number;
   estimated_minutes: number;
   size_kb: number;
+  video_compare_mb?: number;
   description: string;
   lesson: Lesson;
   quiz: QuizQuestion[];
+  interactive_unit?: InteractiveUnit | null;
 }
 
 export interface OfflineCourseRecord extends CoursePackage {

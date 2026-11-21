@@ -1,5 +1,28 @@
 @import "tailwindcss";
 
+.maya-fretwork {
+  height: 6px;
+  width: 100%;
+  opacity: 0.35;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='6' viewBox='0 0 24 6'%3E%3Cpath d='M0 5h4V1h8v4h4V1h8v4' fill='none' stroke='%23ffffff' stroke-width='1.5'/%3E%3C/svg%3E");
+  background-repeat: repeat-x;
+}
+
+/* Modo Ahorro Extremo 2G/3G: elimina gradientes, sombras y ornamentos */
+body.mode-2g header,
+body.mode-2g .passport-card-surface {
+  background: #0f2922 !important;
+  box-shadow: none !important;
+}
+
+body.mode-2g .maya-fretwork {
+  display: none;
+}
+
+body.mode-2g * {
+  box-shadow: none !important;
+}
+
 @media print {
   * {
     -webkit-print-color-adjust: exact !important;
