@@ -1,0 +1,20 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: yaanal-kaan-postgres
+    environment:
+      POSTGRES_DB: yaanal_kaan
+      POSTGRES_USER: yaanal
+      POSTGRES_PASSWORD: yaanal_dev_pass
+    ports:
+      - "5433:5432"
+    volumes:
+      - yaanal_kaan_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U yaanal -d yaanal_kaan"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+volumes:
+  yaanal_kaan_pgdata:
